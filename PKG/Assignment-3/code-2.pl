@@ -1,0 +1,12 @@
+edge(1, 3).
+edge(2, 1).
+edge(3, 2).
+edge(2, 5).
+edge(3, 5).
+edge(3, 7).
+edge(4, 6).
+edge(2, 4).
+connected(X, Y):-
+	edge(X, Y).
+connected(X, Y):-
+	edge(Y, X).
