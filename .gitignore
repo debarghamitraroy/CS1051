@@ -246,3 +246,5 @@ receiver
 *.docx
 *.wav
 *.log
+ML/images
+som_approximation.gif
