@@ -1,5 +1,3 @@
-/* sender.c */
-
 #include "common.h"
 #include <arpa/inet.h>
 #include <errno.h>
@@ -13,9 +11,8 @@
 #include <unistd.h>
 
 static void usage(const char *prog) {
-    fprintf(stderr,
-            "Usage: %s <receiver_ip> <port> <file_path> [loss_prob%%]\n", prog);
-    fprintf(stderr, "Example: %s 127.0.0.1 9999 source.bin 0\n", prog);
+    fprintf(stderr, "Usage: %s <receiver_ip> <port> <file_path> [loss_prob%%]\n", prog);
+    fprintf(stderr, "Example: %s 127.0.0.1 8080 test.txt 0\n", prog);
 }
 
 static double parse_loss_prob(const char *s) {
@@ -42,39 +39,29 @@ int main(int argc, char **argv) {
     int dst_port = atoi(argv[2]);
     const char *file_path = argv[3];
     double loss_prob = (argc == 5) ? parse_loss_prob(argv[4]) : 0.0;
-
     srand((unsigned)time(NULL));
-
-    // Derive file name (strip directories)
     const char *slash = strrchr(file_path, '/');
     const char *fname = slash ? slash + 1 : file_path;
     if (strlen(fname) > FILENAME_MAXLEN) {
         fprintf(stderr, "File name too long (max %d)\n", FILENAME_MAXLEN);
         return 1;
     }
-
     FILE *fp = fopen(file_path, "rb");
     if (!fp) {
-        perror("fopen");
+        perror("Unable to open the file");
         return 1;
     }
-
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) {
         perror("socket");
         fclose(fp);
         return 1;
     }
-
-    // Set a receive timeout for ACKs
     struct timeval tv;
     tv.tv_sec = DEFAULT_TIMEOUT_MS / 1000;
     tv.tv_usec = (DEFAULT_TIMEOUT_MS % 1000) * 1000;
-    if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
-        perror("setsockopt SO_RCVTIMEO");
-        // continue anyway
-    }
-
+    if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0)
+        perror("setsockopt SO_RCVTIMEO error");
     struct sockaddr_in dst;
     memset(&dst, 0, sizeof(dst));
     dst.sin_family = AF_INET;
@@ -85,14 +72,10 @@ int main(int argc, char **argv) {
         close(sock);
         return 1;
     }
-
     uint8_t buffer[MAX_PACKET_SIZE];
     uint32_t seq = 0;
     size_t nread;
-
-    while ((nread
-            = fread(buffer + sizeof(struct PacketHeader), 1, SEGMENT_SIZE, fp))
-           > 0) {
+    while ((nread = fread(buffer + sizeof(struct PacketHeader), 1, SEGMENT_SIZE, fp)) > 0) {
         struct PacketHeader *hdr = (struct PacketHeader *)buffer;
         memset(hdr, 0, sizeof(*hdr));
         hdr->seq = htonl(seq);
@@ -100,40 +83,27 @@ int main(int argc, char **argv) {
         hdr->eof = 0;
         strncpy(hdr->file, fname, FILENAME_MAXLEN);
         hdr->checksum = 0;
-
-        // Compute checksum over header (with checksum=0) + payload
-        hdr->checksum = htonl(csum32((uint8_t *)hdr, sizeof(*hdr))
-                              + csum32(buffer + sizeof(*hdr), (uint32_t)nread));
-
+        hdr->checksum = htonl(csum32((uint8_t *)hdr, sizeof(*hdr)) + csum32(buffer + sizeof(*hdr), (uint32_t)nread));
         ssize_t pkt_len = sizeof(*hdr) + (ssize_t)nread;
-
-        // Stop-and-Wait: send -> wait for ACK -> retransmit on timeout or bad
-        // ACK
         for (;;) {
             if (!maybe_drop(loss_prob)) {
-                if (sendto(sock, buffer, pkt_len, 0, (struct sockaddr *)&dst,
-                           sizeof(dst))
-                    != pkt_len) {
+                if (sendto(sock, buffer, pkt_len, 0, (struct sockaddr *)&dst, sizeof(dst)) != pkt_len) {
                     perror("sendto");
                 } else {
                     printf("Sent seq=%u len=%zu\n", seq, nread);
                 }
-            } else {
+            } else
                 printf("DROP (sim) seq=%u\n", seq);
-            }
-
             struct AckPacket ack;
             socklen_t slen = sizeof(dst);
-            ssize_t rc = recvfrom(sock, &ack, sizeof(ack), 0,
-                                  (struct sockaddr *)&dst, &slen);
+            ssize_t rc = recvfrom(sock, &ack, sizeof(ack), 0, (struct sockaddr *)&dst, &slen);
             if (rc < 0) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
-                    printf("Timeout waiting for ACK %u, retransmitting...\n",
-                           seq);
-                    continue; // retransmit
+                    printf("Timeout waiting for ACK %u, retransmitting...\n", seq);
+                    continue;
                 } else {
-                    perror("recvfrom");
-                    continue; // try again
+                    perror("recvfrom error");
+                    continue;
                 }
             }
             if ((size_t)rc != sizeof(ack)) {
@@ -151,15 +121,11 @@ int main(int argc, char **argv) {
             if (ack_seq == seq) {
                 printf("ACK %u OK\n", seq);
                 seq++;
-                break; // send next packet
-            } else {
-                printf("Unexpected ACK %u (wanted %u), retransmitting...\n",
-                       ack_seq, seq);
-            }
+                break;
+            } else
+                printf("Unexpected ACK %u (wanted %u), retransmitting...\n", ack_seq, seq);
         }
     }
-
-    // Send EOF packet
     {
         struct PacketHeader hdr;
         memset(&hdr, 0, sizeof(hdr));
@@ -169,31 +135,23 @@ int main(int argc, char **argv) {
         strncpy(hdr.file, fname, FILENAME_MAXLEN);
         hdr.checksum = 0;
         hdr.checksum = htonl(csum32((uint8_t *)&hdr, sizeof(hdr)));
-
         for (;;) {
             if (!maybe_drop(loss_prob)) {
-                if (sendto(sock, &hdr, sizeof(hdr), 0, (struct sockaddr *)&dst,
-                           sizeof(dst))
-                    != sizeof(hdr)) {
-                    perror("sendto EOF");
-                } else {
+                if (sendto(sock, &hdr, sizeof(hdr), 0, (struct sockaddr *)&dst, sizeof(dst)) != sizeof(hdr))
+                    perror("sendto EOF error");
+                else
                     printf("Sent EOF seq=%u\n", seq);
-                }
-            } else {
+            } else
                 printf("DROP (sim) EOF seq=%u\n", seq);
-            }
-
             struct AckPacket ack;
             socklen_t slen = sizeof(dst);
-            ssize_t rc = recvfrom(sock, &ack, sizeof(ack), 0,
-                                  (struct sockaddr *)&dst, &slen);
+            ssize_t rc = recvfrom(sock, &ack, sizeof(ack), 0, (struct sockaddr *)&dst, &slen);
             if (rc < 0) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
-                    printf(
-                        "Timeout waiting for EOF-ACK, retransmitting EOF...\n");
+                    printf("Timeout waiting for EOF-ACK, retransmitting EOF...\n");
                     continue;
                 } else {
-                    perror("recvfrom EOF");
+                    perror("recvfrom EOF error");
                     continue;
                 }
             }
@@ -209,7 +167,6 @@ int main(int argc, char **argv) {
             printf("Bad EOF ACK, retrying...\n");
         }
     }
-
     fclose(fp);
     close(sock);
     return 0;

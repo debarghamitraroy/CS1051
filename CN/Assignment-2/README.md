@@ -34,38 +34,6 @@
 
 - Go to the directory and open the terminal.
 
-- Run the [`udpserver.c`][def5] file using the below command:
-
-  ```bash
-  gcc udpserver.c -o udpserver
-  ```
-
-- Run the `udpserver` file using the below command:
-
-  ```bash
-  ./udpserver
-  ```
-
-- Open another terminal and run the [`udpclient.c`][def6] file using the below command:
-
-  ```bash
-  gcc udpclient.c -o udpclient
-  ```
-
-- Run the `udpclient` file using the below command:
-
-  ```bash
-  ./udpclient
-  ```
-
-- Try to send some messages from the client terminal.
-
-- You can see the UDP packets in the [WireShark][def2] window.
-
-  [![UDP Packet Capture][def9]][def9]
-
-- Now, stop the UDP server and client by pressing `Ctrl + C`.
-
 - Now, run the [`tcpserver.c`][def7] file using the below command:
 
   ```bash
@@ -94,13 +62,13 @@
 
 - You can see the TCP packets in the [WireShark][def2] window.
 
-  [![TCP Packet Capture][def10]][def10]
+  [![TCP Packet Capture][def9]][def9]
 
 ### Solution-2
 
 - Open [WireShark][def2] and click on `wlo1` to capture the packets.
 
-  [![WireShark Capture][def22]][def22]
+  [![WireShark Capture][def21]][def21]
 
 - To find the IP address of [`nitdgp.ac.in`][def3], run the below command in terminal:
 
@@ -108,7 +76,7 @@
   nslookup nitdgp.ac.in
   ```
 
-  [![IP Address Capture][def11]][def11]
+  [![IP Address Capture][def10]][def10]
 
 - Install `telnet` and `curl` if not installed.
 
@@ -132,7 +100,7 @@
 
   Alternatively, you can also open any browser and go to [`nitdgp.ac.in`][def3].
 
-  [![WireShark Capture][def12]][def12]
+  [![WireShark Capture][def11]][def11]
 
 - Now go to the [WireShark][def2] window and filter the packets by typing below command in the filter bar.
 
@@ -142,7 +110,7 @@
 
 - You can see the TCP packets in the [WireShark][def2] window.
 
-  [![TCP Packet Capture][def13]][def13]
+  [![TCP Packet Capture][def12]][def12]
 
 ### Solution-3 (a)
 
@@ -190,11 +158,11 @@
   tcp.flags.urg == 1 && tcp.port == 8080
   ```
 
-  [![URG Flag Filter][def14]][def14]
+  [![URG Flag Filter][def13]][def13]
 
 - Go to the directory and open the terminal.
 
-- Run the [`urgentserver.c`][def15] file using the below command:
+- Run the [`urgentserver.c`][def14] file using the below command:
 
   ```bash
   gcc urgentserver.c -o urgentserver
@@ -206,7 +174,7 @@
   ./urgentserver
   ```
 
-- Open another terminal and run the [`urgentclient.c`][def16] file using the below command:
+- Open another terminal and run the [`urgentclient.c`][def15] file using the below command:
 
   ```bash
   gcc urgentclient.c -o urgentclient
@@ -222,7 +190,7 @@
 
 - Open [WireShark][def2] and click on `wlo1` to capture the packets.
 
-  [![WireShark Capture][def22]][def22]
+  [![WireShark Capture][def21]][def21]
 
 - Open terminal and run the below command to connect to the server of [`nitdgp.ac.in`][def3]:
 
@@ -240,7 +208,7 @@
 
   Alternatively, you can also open any browser and go to [`nitdgp.ac.in`][def3].
 
-  [![WireShark Capture][def17]][def17]
+  [![WireShark Capture][def16]][def16]
 
 - Now go to the [WireShark][def2] window and filter the packets by typing below command in the filter bar.
 
@@ -250,17 +218,17 @@
 
 - You can see the TCP packets in the [WireShark][def2] window.
 
-  [![TCP Packet Capture][def18]][def18]
+  [![TCP Packet Capture][def17]][def17]
 
 - In the top packet list, look for the **first TCP packet** from your IP $\rightarrow 14.139.221.27$ with Info column showing `SYN`.
 
 - Click on that packet to see the details in the middle pane.
 
-  [![SYN Packet][def19]][def19]
+  [![SYN Packet][def18]][def18]
 
 - Expand the `Transmission Control Protocol` section. The Sequence Number (raw) field shows the sequence number of the TCP `SYN` segment.
 
-  [![SYN Packet Details][def20]][def20]
+  [![SYN Packet Details][def19]][def19]
 
   In this case, the sequence number (raw) is $2805640763$.
 
@@ -270,7 +238,7 @@
 
 - In the same `Transmission Control Protocol` section, look for the `Flags` field.
 
-  [![SYN Packet Flags][def21]][def21]
+  [![SYN Packet Flags][def20]][def20]
 
 So, The thing that identifies the segment as a `SYN` segment is:
 
@@ -283,7 +251,7 @@ So, The thing that identifies the segment as a `SYN` segment is:
 
 - Open [WireShark][def2] and click on `wlo1` to capture the packets.
 
-  [![WireShark Capture][def22]][def22]
+  [![WireShark Capture][def21]][def21]
 
 - Open terminal and run the below command to connect to the server of [`nitdgp.ac.in`][def3]:
 
@@ -300,7 +268,7 @@ So, The thing that identifies the segment as a `SYN` segment is:
   or,
   Alternatively, you can also open any browser and go to [`nitdgp.ac.in`][def3].
 
-  [![WireShark Capture][def17]][def17]
+  [![WireShark Capture][def16]][def16]
 
 - Now go to the [WireShark][def2] window and filter the packets by typing below command in the filter bar.
 
@@ -310,13 +278,13 @@ So, The thing that identifies the segment as a `SYN` segment is:
 
 - You can see the TCP packets in the [WireShark][def2] window.
 
-  [![TCP Packet Capture][def23]][def23]
+  [![TCP Packet Capture][def22]][def22]
 
 - In the top packet list, look for the **second TCP packet** from your IP $\rightarrow 14.139.221.27$ with Info column showing `SYN, ACK`.
 
 - Click on that packet to see the details in the middle pane.
 
-  [![SYN-ACK Packet][def24]][def24]
+  [![SYN-ACK Packet][def23]][def23]
 
 So, The Sequence Number of the `SYN-ACK` segment is the server’s own Initial Sequence Number (ISN).
 
@@ -326,41 +294,38 @@ So, The Sequence Number of the `SYN-ACK` segment is the server’s own Initial S
 
 > The value of the Acknowledgement field in the `SYN-ACK` segment is equal to the client’s Initial Sequence Number plus $1$. In our capture, Wireshark displayed it as $1$ (relative), corresponding to the client’s `ISN + 1` ie. $3549778751$ i this case.
 
-[![SYN-ACK Acknowledgement][def24]][def24]
+[![SYN-ACK Acknowledgement][def23]][def23]
 
 ### Solution-3 (h)
 
 > [`nitdgp.ac.in`][def3] determined the value of the Acknowledgement field by taking the Initial Sequence Number (ISN) from the client’s `SYN` segment and adding $1$. This is required because the `SYN` flag consumes one sequence number, so the next expected byte from the client is `ISN + 1`.
 
-[![SYN-ACK Acknowledgement][def24]][def24]
+[![SYN-ACK Acknowledgement][def23]][def23]
 
 ### Solution-3 (i)
 
 > The segment is identified as a `SYN-ACK` segment because in the TCP header, both the `SYN` flag and the `ACK` flag are set (`SYN = 1`, `ACK = 1`). This distinguishes it from the initial `SYN` (which has `ACK = 0`) and from later pure `ACK` packets (which have `SYN = 0`, `ACK = 1`).
 
-[![SYN-ACK Packet Flags][def24]][def24]
+[![SYN-ACK Packet Flags][def23]][def23]
 
 [def1]: https://sites.google.com/view/sscomputernetworks/assignments/2024-25/assignment-2
 [def2]: https://www.wireshark.org/
 [def3]: https://nitdgp.ac.in/
 [def4]: ../images/img_01.png
-[def5]: ./udpserver.c
-[def6]: ./udpclient.c
-[def7]: ./tcpserver.c
-[def8]: ./tcpclient.c
-[def9]: ../images/img_02.png
-[def10]: ../images/img_03.png
-[def11]: ../images/img_04.png
-[def12]: ../images/img_05.png
-[def13]: ../images/img_06.png
-[def14]: ../images/img_07.png
-[def15]: ./urgentserver.c
-[def16]: ./urgentclient.c
-[def17]: ../images/img_08.png
-[def18]: ../images/img_09.png
-[def19]: ../images/img_10.png
-[def20]: ../images/img_11.png
-[def21]: ../images/img_12.png
-[def22]: ../images/img_13.png
-[def23]: ../images/img_14.png
-[def24]: ../images/img_15.png
+[def7]: ./tcp_server.c
+[def8]: ./tcp_client.c
+[def9]: ../images/img_03.png
+[def10]: ../images/img_04.png
+[def11]: ../images/img_05.png
+[def12]: ../images/img_06.png
+[def13]: ../images/img_07.png
+[def14]: ./urgent_server.c
+[def15]: ./urgent_client.c
+[def16]: ../images/img_08.png
+[def17]: ../images/img_09.png
+[def18]: ../images/img_10.png
+[def19]: ../images/img_11.png
+[def20]: ../images/img_12.png
+[def21]: ../images/img_13.png
+[def22]: ../images/img_14.png
+[def23]: ../images/img_15.png

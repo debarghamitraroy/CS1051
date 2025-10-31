@@ -1,4 +1,4 @@
-# [Assignment-3: Wireshark Analysis of TCP/UDP Communication and Protocol Behavior][def6]
+# [Assignment-3: Wireshark Analysis of TCP/UDP Communication and Protocol Behavior][def1]
 
 ## Data Transmission Under the Microscope: Wireshark's Watchful Eye
 
@@ -28,7 +28,7 @@ By following these steps and leveraging Wireshark's capabilities, you can gain v
 
 - Go to the directory and open the terminal.
 
-- Run the [`server.c`][def5] file using the below command:
+- Run the [`server.c`][def7] file using the below command:
 
   ```bash
   gcc server.c -o server
@@ -40,7 +40,7 @@ By following these steps and leveraging Wireshark's capabilities, you can gain v
   ./server
   ```
 
-- Open another terminal and run the [`client.c`][def6] file using the below command:
+- Open another terminal and run the [`client.c`][def8] file using the below command:
 
   ```bash
   gcc client.c -o client
@@ -52,17 +52,19 @@ By following these steps and leveraging Wireshark's capabilities, you can gain v
   ./client
   ```
 
-- Now, you can see the packets being captured in WireShark and the audio file is transferred from the client to the server.
+- Try to send some messages from the client terminal.
 
-  [![WireShark Capture][def4]][def4]
+  [![UDP Message Transfer][def4]][def4]
 
-- There will be a new file named `received_audio.wav` in the directory.
+- You can see the UDP packets in the [WireShark][def2] window.
 
-  [![Received Audio][def5]][def5]
+- Now, open the [WireShark][def2] and you can see the packets being captured in [WireShark][def2] and the message is transferred from the client to the server.
 
-[def1]: ./audio.wav
+- Stop the UDP server and client by pressing `Ctrl + C`.
+
+[def1]: https://sites.google.com/view/sscomputernetworks/assignments/2024-25/assignment-3
 [def2]: https://www.wireshark.org/
 [def3]: ../images/img_01.png
-[def4]: ../images/img_16.png
-[def5]: ../images/img_17.png
-[def6]: https://sites.google.com/view/sscomputernetworks/assignments/2024-25/assignment-3
+[def4]: ../images/img_02.png
+[def7]: ./server.c
+[def8]: ./client.c
